@@ -1,4 +1,4 @@
-package com.example.seven_minute_yoga
+package com.app.yoga
 
 import io.flutter.embedding.android.FlutterActivity
 
