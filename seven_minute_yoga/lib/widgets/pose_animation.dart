@@ -51,11 +51,17 @@ class _PoseAnimatorState extends State<PoseAnimator>
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, _) {
-        return CustomPaint(
-          painter: PosePainter(pose: widget.pose, t: _controller.value),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final size = Size(constraints.maxWidth, constraints.maxHeight);
+        return AnimatedBuilder(
+          animation: _controller,
+          builder: (context, _) {
+            return CustomPaint(
+              size: size,
+              painter: PosePainter(pose: widget.pose, t: _controller.value),
+            );
+          },
         );
       },
     );
@@ -99,31 +105,38 @@ class PosePainter extends CustomPainter {
       ..color = accent.withAlpha(70)
       ..style = PaintingStyle.fill;
 
+    final side = min(size.width, size.height);
+    final offset = Offset((size.width - side) / 2, (size.height - side) / 2);
+    final square = Size(side, side);
+
+    canvas.save();
+    canvas.translate(offset.dx, offset.dy);
+
     canvas.drawCircle(
-      Offset(size.width * 0.2, size.height * 0.2),
-      size.shortestSide * 0.18,
+      Offset(square.width * 0.2, square.height * 0.2),
+      square.shortestSide * 0.18,
       Paint()..color = muted,
     );
 
     final double breath = 0.5 + 0.5 * sin(2 * pi * t);
 
     final _Skeleton skeleton = switch (pose) {
-      PoseType.breath => _poseBreath(size, breath),
-      PoseType.catCow => _poseCatCow(size, breath),
-      PoseType.child => _poseChild(size, breath),
-      PoseType.downDog => _poseDownDog(size, breath),
-      PoseType.forwardFold => _poseForwardFold(size, breath),
-      PoseType.kneesToChest => _poseKneesToChest(size, breath),
-      PoseType.twist => _poseTwist(size, breath),
-      PoseType.plank => _posePlank(size, breath),
-      PoseType.seatedStretch => _poseSeatedStretch(size, breath),
-      PoseType.openChest => _poseOpenChest(size, breath),
-      PoseType.relax => _poseRelax(size, breath),
+      PoseType.breath => _poseBreath(square, breath),
+      PoseType.catCow => _poseCatCow(square, breath),
+      PoseType.child => _poseChild(square, breath),
+      PoseType.downDog => _poseDownDog(square, breath),
+      PoseType.forwardFold => _poseForwardFold(square, breath),
+      PoseType.kneesToChest => _poseKneesToChest(square, breath),
+      PoseType.twist => _poseTwist(square, breath),
+      PoseType.plank => _posePlank(square, breath),
+      PoseType.seatedStretch => _poseSeatedStretch(square, breath),
+      PoseType.openChest => _poseOpenChest(square, breath),
+      PoseType.relax => _poseRelax(square, breath),
     };
 
     _drawSkeleton(
       canvas,
-      size,
+      square,
       skeleton,
       baseLine,
       line,
@@ -131,6 +144,7 @@ class PosePainter extends CustomPainter {
       torsoFill,
       headFill,
     );
+    canvas.restore();
   }
 
   @override
@@ -473,44 +487,40 @@ class PosePainter extends CustomPainter {
     canvas.drawPath(torso, torsoFill);
     canvas.drawPath(torso, base);
 
-    _drawChain(canvas, base, line, [s.shoulderL, s.elbowL, s.wristL]);
-    _drawChain(canvas, base, line, [s.shoulderR, s.elbowR, s.wristR]);
-    _drawChain(canvas, base, line, [s.hipL, s.kneeL, s.ankleL]);
-    _drawChain(canvas, base, line, [s.hipR, s.kneeR, s.ankleR]);
-    _drawChain(canvas, base, line, [s.shoulderL, s.hipL]);
-    _drawChain(canvas, base, line, [s.shoulderR, s.hipR]);
-    _drawChain(canvas, base, line, [s.neck, s.head]);
-
-    final joints = [
-      s.shoulderL,
-      s.shoulderR,
-      s.elbowL,
-      s.elbowR,
-      s.wristL,
-      s.wristR,
-      s.hipL,
-      s.hipR,
-      s.kneeL,
-      s.kneeR,
-      s.ankleL,
-      s.ankleR,
-    ];
-
-    for (final point in joints) {
-      canvas.drawCircle(point, size.shortestSide * 0.018, joint);
-    }
+    _drawSmoothChain(canvas, base, line, [s.shoulderL, s.elbowL, s.wristL]);
+    _drawSmoothChain(canvas, base, line, [s.shoulderR, s.elbowR, s.wristR]);
+    _drawSmoothChain(canvas, base, line, [s.hipL, s.kneeL, s.ankleL]);
+    _drawSmoothChain(canvas, base, line, [s.hipR, s.kneeR, s.ankleR]);
+    _drawSmoothChain(canvas, base, line, [s.shoulderL, s.hipL]);
+    _drawSmoothChain(canvas, base, line, [s.shoulderR, s.hipR]);
+    _drawSmoothChain(canvas, base, line, [s.neck, s.head]);
 
     canvas.drawCircle(s.head, size.shortestSide * 0.06, headFill);
     canvas.drawCircle(s.head, size.shortestSide * 0.06, line);
+    canvas.drawCircle(s.neck, size.shortestSide * 0.015, joint);
   }
 
-  void _drawChain(Canvas canvas, Paint base, Paint line, List<Offset> points) {
+  void _drawSmoothChain(
+    Canvas canvas,
+    Paint base,
+    Paint line,
+    List<Offset> points,
+  ) {
     if (points.length < 2) {
       return;
     }
     final path = Path()..moveTo(points.first.dx, points.first.dy);
     for (int i = 1; i < points.length; i++) {
-      path.lineTo(points[i].dx, points[i].dy);
+      final prev = points[i - 1];
+      final current = points[i];
+      final mid = Offset(
+        (prev.dx + current.dx) / 2,
+        (prev.dy + current.dy) / 2,
+      );
+      path.quadraticBezierTo(prev.dx, prev.dy, mid.dx, mid.dy);
+      if (i == points.length - 1) {
+        path.lineTo(current.dx, current.dy);
+      }
     }
     canvas.drawPath(path, base);
     canvas.drawPath(path, line);
