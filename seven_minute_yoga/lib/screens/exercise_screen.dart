@@ -26,6 +26,23 @@ class _ExerciseScreenState extends ConsumerState<ExerciseScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(() => _animateIn = true);
+      ref
+          .read(routineControllerProvider(widget.routine).notifier)
+          .startOrResume();
+    });
+  }
+
+  @override
+  void dispose() {
+    ref.read(routineControllerProvider(widget.routine).notifier).pause();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     ref.listen<RoutineState>(routineControllerProvider(widget.routine), (
       previous,
       next,
@@ -45,23 +62,6 @@ class _ExerciseScreenState extends ConsumerState<ExerciseScreen> {
       }
     });
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      setState(() => _animateIn = true);
-      ref
-          .read(routineControllerProvider(widget.routine).notifier)
-          .startOrResume();
-    });
-  }
-
-  @override
-  void dispose() {
-    ref.read(routineControllerProvider(widget.routine).notifier).pause();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
     final state = ref.watch(routineControllerProvider(widget.routine));
     final controller = ref.read(
       routineControllerProvider(widget.routine).notifier,
