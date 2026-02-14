@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../theme/colors.dart';
+import '../theme/page_transitions.dart';
+import '../widgets/animated_button.dart';
 import 'privacy_screen.dart';
 
 class AboutScreen extends StatelessWidget {
@@ -14,7 +17,7 @@ class AboutScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('О приложении')),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+          padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -31,17 +34,12 @@ class AboutScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    Text(
-                      '7 Минут Йоги',
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
+                    Text('7 Минут Йоги', style: theme.textTheme.titleLarge),
                     const SizedBox(height: 4),
                     Text(
                       'Версия 1.0.0',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: const Color(0xFF8A857F),
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: AppColors.textSecondary,
                       ),
                     ),
                   ],
@@ -51,14 +49,19 @@ class AboutScreen extends StatelessWidget {
               Text(
                 'Короткие комплексы для утреннего тонуса, работы в офисе и вечернего расслабления.',
                 style: theme.textTheme.bodyLarge?.copyWith(
-                  color: const Color(0xFF6E6A65),
+                  color: AppColors.textSecondary,
                 ),
               ),
-              const SizedBox(height: 20),
-              FilledButton.tonal(
-                onPressed: () =>
-                    Navigator.pushNamed(context, PrivacyScreen.routeName),
-                child: const Text('Политика конфиденциальности'),
+              const Spacer(),
+              AnimatedButton(
+                label: 'Политика конфиденциальности',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    AppPageRoute.fadeSlide(const PrivacyScreen()),
+                  );
+                },
+                isPrimary: false,
               ),
             ],
           ),

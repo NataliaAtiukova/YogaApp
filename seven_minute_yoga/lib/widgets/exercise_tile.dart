@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../models/exercise.dart';
+import '../theme/colors.dart';
+import 'animated_button.dart';
 import 'time_format.dart';
 
 class ExerciseTile extends StatelessWidget {
@@ -30,17 +32,24 @@ class ExerciseTile extends StatelessWidget {
     final theme = Theme.of(context);
     final borderColor = isCurrent
         ? theme.colorScheme.primary
-        : const Color(0xFFE9E5DD);
-    final cardColor = isCurrent ? const Color(0xFFFFFBF4) : Colors.white;
+        : const Color(0xFFE4EAF1);
+    final cardColor = isCurrent ? const Color(0xFFFDFEFE) : Colors.white;
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(18),
+      borderRadius: BorderRadius.circular(20),
       child: Container(
         decoration: BoxDecoration(
           color: cardColor,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: borderColor, width: isCurrent ? 2 : 1),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: borderColor, width: isCurrent ? 1.6 : 1),
+          boxShadow: const [
+            BoxShadow(
+              color: AppColors.shadow,
+              blurRadius: 16,
+              offset: Offset(0, 8),
+            ),
+          ],
         ),
         padding: const EdgeInsets.all(16),
         child: Row(
@@ -50,15 +59,11 @@ class ExerciseTile extends StatelessWidget {
               width: 56,
               height: 56,
               decoration: BoxDecoration(
-                color: const Color(0xFFEFF2EE),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: const Color(0xFFE3E7E1)),
+                color: AppColors.primarySoft,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppColors.border),
               ),
-              child: Icon(
-                exercise.icon,
-                color: const Color(0xFF2F6F6D),
-                size: 28,
-              ),
+              child: Icon(exercise.icon, color: AppColors.primary, size: 28),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -70,8 +75,8 @@ class ExerciseTile extends StatelessWidget {
                       Expanded(
                         child: Text(
                           exercise.title,
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w700,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
@@ -82,12 +87,12 @@ class ExerciseTile extends StatelessWidget {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFE9F3EE),
+                            color: const Color(0xFFE7F4EF),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
                             'Готово',
-                            style: theme.textTheme.labelSmall?.copyWith(
+                            style: theme.textTheme.bodyMedium?.copyWith(
                               color: const Color(0xFF2E6B5B),
                               fontWeight: FontWeight.w600,
                             ),
@@ -98,11 +103,11 @@ class ExerciseTile extends StatelessWidget {
                   const SizedBox(height: 6),
                   Text(
                     exercise.description,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: const Color(0xFF6E6A65),
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: AppColors.textSecondary,
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 12),
                   Row(
                     children: [
                       AnimatedSwitcher(
@@ -114,22 +119,18 @@ class ExerciseTile extends StatelessWidget {
                           key: ValueKey(
                             isCurrent ? remainingSeconds : exercise.duration,
                           ),
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w700,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
                       const Spacer(),
-                      FilledButton(
-                        onPressed: actionEnabled ? onAction : null,
-                        style: FilledButton.styleFrom(
-                          minimumSize: const Size(108, 40),
-                          textStyle: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
+                      SizedBox(
+                        width: 120,
+                        child: AnimatedButton(
+                          label: actionLabel,
+                          onPressed: actionEnabled ? onAction : () {},
                         ),
-                        child: Text(actionLabel),
                       ),
                     ],
                   ),

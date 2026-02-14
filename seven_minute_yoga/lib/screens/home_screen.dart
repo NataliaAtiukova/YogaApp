@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../data/yoga_data.dart';
-import '../models/yoga_routine.dart';
+import '../theme/colors.dart';
+import '../theme/page_transitions.dart';
 import '../widgets/ad_placeholder.dart';
 import '../widgets/routine_card.dart';
 import 'about_screen.dart';
@@ -15,12 +16,15 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late YogaRoutine _selectedRoutine;
+  bool _animateIn = false;
 
   @override
   void initState() {
     super.initState();
-    _selectedRoutine = yogaRoutines.first;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(() => _animateIn = true);
+    });
   }
 
   @override
@@ -32,53 +36,57 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.info_outline),
-            onPressed: () =>
-                Navigator.pushNamed(context, AboutScreen.routeName),
+            onPressed: () {
+              Navigator.push(
+                context,
+                AppPageRoute.fadeSlide(const AboutScreen()),
+              );
+            },
           ),
         ],
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Выберите комплекс',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
+        child: AnimatedOpacity(
+          duration: const Duration(milliseconds: 600),
+          curve: Curves.easeOutCubic,
+          opacity: _animateIn ? 1 : 0,
+          child: AnimatedSlide(
+            duration: const Duration(milliseconds: 600),
+            curve: Curves.easeOutCubic,
+            offset: _animateIn ? Offset.zero : const Offset(0, 0.04),
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+              physics: const BouncingScrollPhysics(),
+              children: [
+                Text('Добро пожаловать', style: theme.textTheme.displaySmall),
+                const SizedBox(height: 6),
+                Text(
+                  'Выберите короткий комплекс на 7 минут.',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              Expanded(
-                child: ListView.separated(
-                  itemCount: yogaRoutines.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: 12),
-                  itemBuilder: (context, index) {
-                    final routine = yogaRoutines[index];
-                    return RoutineCard(
+                const SizedBox(height: 24),
+                ...yogaRoutines.map(
+                  (routine) => Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: RoutineCard(
                       routine: routine,
-                      isSelected: routine.id == _selectedRoutine.id,
-                      onTap: () => setState(() => _selectedRoutine = routine),
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(height: 16),
-              FilledButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => RoutineScreen(routine: _selectedRoutine),
+                      onStart: () {
+                        Navigator.push(
+                          context,
+                          AppPageRoute.fadeSlide(
+                            RoutineScreen(routine: routine),
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-                child: const Text('Начать'),
-              ),
-              const SizedBox(height: 12),
-              const AdPlaceholderBanner(),
-            ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const AdPlaceholderBanner(),
+              ],
+            ),
           ),
         ),
       ),

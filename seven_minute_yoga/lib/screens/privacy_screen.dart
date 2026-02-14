@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme/colors.dart';
+
 class PrivacyScreen extends StatelessWidget {
   const PrivacyScreen({super.key});
 
@@ -12,13 +14,13 @@ class PrivacyScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Политика конфиденциальности')),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+          padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
           child: Text(
             'Мы не собираем и не передаем персональные данные. '
             'Все упражнения и прогресс хранятся локально на устройстве. '
             'Рекламные блоки пока не активны и представлены заглушками.',
             style: theme.textTheme.bodyLarge?.copyWith(
-              color: const Color(0xFF6E6A65),
+              color: AppColors.textSecondary,
             ),
           ),
         ),

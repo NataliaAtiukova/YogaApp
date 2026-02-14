@@ -128,6 +128,13 @@ class RoutineController extends StateNotifier<RoutineState> {
     );
   }
 
+  void skip() {
+    if (state.isCompleted) {
+      return;
+    }
+    _advance();
+  }
+
   void setManualStepIndex(int index) {
     final stepsCount = state.routine.exercises[state.currentIndex].steps.length;
     if (stepsCount == 0) {

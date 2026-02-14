@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme/colors.dart';
+
 class AdPlaceholderBanner extends StatelessWidget {
   const AdPlaceholderBanner({super.key});
 
@@ -31,15 +33,15 @@ class _AdContainer extends StatelessWidget {
       height: height,
       width: double.infinity,
       decoration: BoxDecoration(
-        color: const Color(0xFFF3F0E9),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE0DBD3)),
+        color: const Color(0xFFF0F4F8),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.border),
       ),
       alignment: Alignment.center,
       child: Text(
         label,
-        style: theme.textTheme.labelMedium?.copyWith(
-          color: const Color(0xFF7C7770),
+        style: theme.textTheme.bodyMedium?.copyWith(
+          color: AppColors.textSecondary,
         ),
       ),
     );

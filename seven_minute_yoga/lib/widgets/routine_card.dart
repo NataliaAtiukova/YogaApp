@@ -1,83 +1,79 @@
 import 'package:flutter/material.dart';
 
 import '../models/yoga_routine.dart';
+import '../theme/colors.dart';
+import 'animated_button.dart';
 import 'time_format.dart';
 
-class RoutineCard extends StatelessWidget {
-  const RoutineCard({
-    super.key,
-    required this.routine,
-    required this.isSelected,
-    required this.onTap,
-  });
+class RoutineCard extends StatefulWidget {
+  const RoutineCard({super.key, required this.routine, required this.onStart});
 
   final YogaRoutine routine;
-  final bool isSelected;
-  final VoidCallback onTap;
+  final VoidCallback onStart;
+
+  @override
+  State<RoutineCard> createState() => _RoutineCardState();
+}
+
+class _RoutineCardState extends State<RoutineCard> {
+  bool _pressed = false;
+
+  void _setPressed(bool value) {
+    if (_pressed == value) return;
+    setState(() => _pressed = value);
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final accent = theme.colorScheme.primary;
 
-    return InkWell(
-      borderRadius: BorderRadius.circular(20),
-      onTap: onTap,
-      child: Card(
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: isSelected ? accent : const Color(0xFFE3E0D8),
-              width: isSelected ? 2 : 1,
+    return AnimatedScale(
+      scale: _pressed ? 0.97 : 1.0,
+      duration: const Duration(milliseconds: 120),
+      curve: Curves.easeOutCubic,
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(24),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(24),
+          onTap: widget.onStart,
+          onTapDown: (_) => _setPressed(true),
+          onTapCancel: () => _setPressed(false),
+          onTapUp: (_) => _setPressed(false),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: AppColors.cardGradient,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: AppColors.border),
+              boxShadow: const [
+                BoxShadow(
+                  color: AppColors.shadow,
+                  blurRadius: 20,
+                  offset: Offset(0, 10),
+                ),
+              ],
             ),
-          ),
-          padding: const EdgeInsets.all(18),
-          child: Row(
-            children: [
-              Container(
-                width: 56,
-                height: 56,
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? accent.withValues(alpha: 0.15)
-                      : const Color(0xFFF2EFEA),
-                  borderRadius: BorderRadius.circular(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(widget.routine.title, style: theme.textTheme.titleLarge),
+                const SizedBox(height: 6),
+                Text(
+                  widget.routine.description,
+                  style: theme.textTheme.bodyMedium,
                 ),
-                child: Icon(
-                  Icons.self_improvement,
-                  color: isSelected ? accent : const Color(0xFF6E6A65),
+                const SizedBox(height: 14),
+                Text(
+                  '${widget.routine.exercises.length} упражнений · ${formatMinutesShort(widget.routine.totalDuration)}',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      routine.title,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      routine.description,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: const Color(0xFF6E6A65),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      '${routine.exercises.length} упражнений · ${formatMinutesShort(routine.totalDuration)}',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: const Color(0xFF8A857F),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+                const SizedBox(height: 18),
+                AnimatedButton(label: 'Начать', onPressed: widget.onStart),
+              ],
+            ),
           ),
         ),
       ),
