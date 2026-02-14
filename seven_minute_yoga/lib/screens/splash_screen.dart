@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/colors.dart';
 import '../theme/page_transitions.dart';
-import 'home_screen.dart';
+import 'main_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -36,7 +36,7 @@ class _SplashScreenState extends State<SplashScreen>
       if (!mounted) return;
       Navigator.of(
         context,
-      ).pushReplacement(AppPageRoute.fadeSlide(const HomeScreen()));
+      ).pushReplacement(AppPageRoute.fadeSlide(const MainScreen()));
     });
   }
 

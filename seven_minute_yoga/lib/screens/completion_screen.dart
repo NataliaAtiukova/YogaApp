@@ -1,26 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../models/workout_session.dart';
 import '../models/yoga_routine.dart';
+import '../services/stats_service.dart';
 import '../theme/colors.dart';
 import '../theme/page_transitions.dart';
 import '../widgets/ad_placeholder.dart';
 import '../widgets/animated_button.dart';
 import 'exercise_screen.dart';
 
-class CompletionScreen extends StatefulWidget {
+class CompletionScreen extends ConsumerStatefulWidget {
   const CompletionScreen({super.key, required this.routine});
 
   final YogaRoutine routine;
 
   @override
-  State<CompletionScreen> createState() => _CompletionScreenState();
+  ConsumerState<CompletionScreen> createState() => _CompletionScreenState();
 }
 
-class _CompletionScreenState extends State<CompletionScreen>
+class _CompletionScreenState extends ConsumerState<CompletionScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _scale;
   bool _showContent = false;
+  bool _saved = false;
 
   @override
   void initState() {
@@ -35,7 +39,24 @@ class _CompletionScreenState extends State<CompletionScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       setState(() => _showContent = true);
+      _saveSession();
     });
+  }
+
+  Future<void> _saveSession() async {
+    if (_saved) return;
+    _saved = true;
+    final totalSeconds = widget.routine.totalDuration;
+    final minutes = (totalSeconds / 60).ceil();
+    final calories = minutes * 3;
+    final session = WorkoutSession(
+      date: DateTime.now(),
+      durationMinutes: minutes,
+      calories: calories,
+    );
+
+    await ref.read(statsServiceProvider).addSession(session);
+    ref.invalidate(statsSummaryProvider);
   }
 
   @override
