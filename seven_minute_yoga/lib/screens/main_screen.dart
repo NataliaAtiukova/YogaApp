@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../services/ads_service.dart';
 import '../theme/colors.dart';
 import '../theme/page_transitions.dart';
 import 'about_screen.dart';
@@ -13,9 +14,38 @@ class MainScreen extends StatefulWidget {
   State<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   int _index = 0;
   double _opacity = 1;
+  bool _launchAdRequested = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _tryShowLaunchAd();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      AdsService.instance.showAppOpenAdIfAvailable();
+    }
+  }
+
+  Future<void> _tryShowLaunchAd() async {
+    if (_launchAdRequested) return;
+    _launchAdRequested = true;
+    await Future<void>.delayed(const Duration(milliseconds: 350));
+    if (!mounted) return;
+    await AdsService.instance.showAppOpenAdIfAvailable();
+  }
 
   void _onTap(int index) {
     if (index == _index) return;

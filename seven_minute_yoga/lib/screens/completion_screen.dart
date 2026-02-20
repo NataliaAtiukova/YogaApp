@@ -6,7 +6,6 @@ import '../models/yoga_routine.dart';
 import '../services/stats_service.dart';
 import '../theme/colors.dart';
 import '../theme/page_transitions.dart';
-import '../widgets/ad_placeholder.dart';
 import '../widgets/animated_button.dart';
 import 'exercise_screen.dart';
 
@@ -118,7 +117,6 @@ class _CompletionScreenState extends ConsumerState<CompletionScreen>
                 ),
               ),
               const SizedBox(height: 24),
-              const AdPlaceholderInterstitial(),
               const Spacer(),
               AnimatedOpacity(
                 duration: const Duration(milliseconds: 400),

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../logic/routine_controller.dart';
 import '../models/yoga_routine.dart';
+import '../services/ads_service.dart';
 import '../theme/colors.dart';
 import '../theme/page_transitions.dart';
 import '../widgets/animated_button.dart';
@@ -22,6 +23,7 @@ class ExerciseScreen extends ConsumerStatefulWidget {
 
 class _ExerciseScreenState extends ConsumerState<ExerciseScreen> {
   bool _animateIn = false;
+  bool _isTransitionAdFlow = false;
 
   @override
   void initState() {
@@ -29,6 +31,7 @@ class _ExerciseScreenState extends ConsumerState<ExerciseScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       setState(() => _animateIn = true);
+      AdsService.instance.preloadInterstitialAd();
       ref
           .read(routineControllerProvider(widget.routine).notifier)
           .startOrResume();
@@ -56,9 +59,7 @@ class _ExerciseScreenState extends ConsumerState<ExerciseScreen> {
       }
 
       if (previous != null && previous.currentIndex != next.currentIndex) {
-        if (previous.isRunning) {
-          HapticFeedback.lightImpact();
-        }
+        _handleTransitionInterstitial(previous, next);
       }
     });
 
@@ -265,5 +266,34 @@ class _ExerciseScreenState extends ConsumerState<ExerciseScreen> {
     final stepDuration = total / steps;
     final index = (elapsed / stepDuration).floor();
     return index.clamp(0, steps - 1);
+  }
+
+  Future<void> _handleTransitionInterstitial(
+    RoutineState previous,
+    RoutineState next,
+  ) async {
+    if (_isTransitionAdFlow || next.isCompleted) return;
+
+    final controller = ref.read(
+      routineControllerProvider(widget.routine).notifier,
+    );
+
+    _isTransitionAdFlow = true;
+    if (previous.isRunning) {
+      HapticFeedback.lightImpact();
+      controller.pause();
+    }
+
+    await AdsService.instance.showInterstitialAdIfAvailable();
+
+    if (!mounted) {
+      _isTransitionAdFlow = false;
+      return;
+    }
+    final latest = ref.read(routineControllerProvider(widget.routine));
+    if (!latest.isCompleted && !latest.isRunning) {
+      controller.startOrResume();
+    }
+    _isTransitionAdFlow = false;
   }
 }

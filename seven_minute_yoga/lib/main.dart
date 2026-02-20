@@ -5,11 +5,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'screens/about_screen.dart';
 import 'screens/privacy_screen.dart';
 import 'screens/splash_screen.dart';
+import 'services/ads_service.dart';
 import 'theme/app_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  await AdsService.instance.initialize();
   runApp(const ProviderScope(child: SevenMinuteYogaApp()));
 }
 
