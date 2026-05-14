@@ -1,43 +1,35 @@
-# 7 Минут Йоги
+# YogaApp
 
-Android‑приложение на Flutter: короткие комплексы йоги на 7 минут для утреннего тонуса, офисной разгрузки и вечернего расслабления. Все данные локально, без регистрации.
+Flutter app with short guided yoga sessions (7-minute routines).
 
-## Возможности
-- 3 комплекса: Утро, Офис, Вечер
-- Таймер с паузой/продолжением и авто‑переходом
-- Прогресс комплекса
-- Экран завершения с «Вы молодец»
-- Экран «О приложении» и политика конфиденциальности
-- Подготовка под AdMob (заглушки)
-- Минималистичный Material 3 UI
+## Status
 
-## Технологии
-- Flutter (Dart)
-- Riverpod (state management)
+Portfolio/WIP project.
+
+## Stack
+
+- Flutter
+- Dart
+- Riverpod
 - Material 3
 
-## Структура проекта
-Проект Flutter находится в папке:
-- `seven_minute_yoga/`
+## Run locally
 
-Ключевые директории внутри Flutter‑проекта:
-- `lib/models/` — модели данных
-- `lib/data/` — локальные данные
-- `lib/logic/` — логика таймера/упражнений
-- `lib/screens/` — экраны
-- `lib/widgets/` — UI‑компоненты
-- `lib/services/` — AdMob заглушки/конфиг
-
-## Запуск
+1. Clone the repository:
 ```bash
-cd "seven_minute_yoga"
+git clone https://github.com/NataliaAtiukova/YogaApp.git
+cd YogaApp/seven_minute_yoga
+```
+2. Install dependencies:
+```bash
 flutter pub get
+```
+3. Run:
+```bash
 flutter run
 ```
 
-## Требования
-- Flutter SDK
-- Android SDK (minSdk 21+)
+## Notes
 
-## Скриншоты
-Добавьте сюда скриншоты при необходимости.
+- Core Flutter project is in `seven_minute_yoga/`.
+- Main source code is in `seven_minute_yoga/lib/`.
